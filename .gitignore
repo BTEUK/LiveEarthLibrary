@@ -36,3 +36,10 @@ build/
 
 ### Mac OS ###
 .DS_Store
+/src/main/java/net/bteuk/liveearthlibrary/App.java
+/src/test/java/net/bteuk/liveearthlibrary/AppTest.java
+/.idea/encodings.xml
+/.idea/misc.xml
+/.idea/uiDesigner.xml
+/.idea/vcs.xml
+/.idea/.gitignore
