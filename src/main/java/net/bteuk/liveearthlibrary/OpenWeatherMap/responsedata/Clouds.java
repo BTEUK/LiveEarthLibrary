@@ -5,6 +5,15 @@ package net.bteuk.liveearthlibrary.OpenWeatherMap.responsedata;
  */
 public class Clouds
 {
-    //Cloudiness (%)
+    /** Cloudiness (%) */
     private int all;
+
+    /**
+     *
+     * @return The cloud cover percentage
+     */
+    public int getAll()
+    {
+        return all;
+    }
 }
