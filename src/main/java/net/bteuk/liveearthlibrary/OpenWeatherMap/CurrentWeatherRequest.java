@@ -119,7 +119,6 @@ public class CurrentWeatherRequest
                     //Extracts the content from the response
                     int iCode = response.getCode();
                     //TODO: Some error handling
-                    //If it's not 200 then BTE should send me some lore/reasons in the response
 
                     final HttpEntity entity = response.getEntity();
                     InputStream content = entity.getContent();
