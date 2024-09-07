@@ -40,6 +40,15 @@ public class Star
 
     /**
      *
+     * @return The radius of this star in Solar Radii
+     */
+    public String getName()
+    {
+        return szName;
+    }
+
+    /**
+     *
      * @return A reference to the spherical coordinates of this star
      */
     public SphericalCoordinates getEquatorialCoordinates()
@@ -92,6 +101,7 @@ public class Star
         }
         catch (IOException e)
         {
+            System.out.println("[LiveEarthLibrary] Error reading file");
             return new Star[0];
         }
         finally
@@ -122,6 +132,8 @@ public class Star
         //Fetch the size of the data list and initialise a new Star array with this star
         int iNumStars = starData.data.size();
         Star allStars[] = new Star[iNumStars];
+
+        System.out.println("[LiveEarthLibrary] " +iNumStars +" stars found");
 
         //Goes through the 'data' and extracts the information by converting the list of objects for each star into meaningful data
         for (int i = 0 ; i < iNumStars ; i++)
