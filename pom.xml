@@ -32,13 +32,13 @@
       <groupId>org.apache.httpcomponents.client5</groupId>
       <artifactId>httpclient5</artifactId>
       <version>5.2.1</version>
-      <scope>compile</scope>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
-      <version>RELEASE</version>
-      <scope>compile</scope>
+      <version>1.18.34</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
