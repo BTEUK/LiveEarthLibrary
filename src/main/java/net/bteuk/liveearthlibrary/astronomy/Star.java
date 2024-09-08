@@ -83,57 +83,33 @@ public class Star
         return fApparentMagnitude;
     }
 
-    public static Star[] getStarList()
+    /**
+     * Extracts the information from the star data provided in the resources of this library, serialises this, and returns the star data
+     * @return An array of Stars corresponding to the Star data stored in the resources of this library
+     */
+    public static Star[] getStarListFromResources()
     {
-        Gson gson = new Gson();
-        FileReader fileReader = null;
-        BufferedReader bufferedReader = null;
+        //Loads the data from files
+        String szJsonString = readStarDataFromLibraryResources();
 
-        String jsonString;
+        return getStarListFromJsonText(szJsonString);
+    }
 
-        //Try to read in the json
-        try
-        {
-            fileReader = new FileReader("src/main/java/net/bteuk/liveearthlibrary/astronomy/All Stars.json");
-            bufferedReader = new BufferedReader(fileReader);
-            jsonString = bufferedReader.readLine();
-
-        }
-        catch (IOException e)
-        {
-            System.out.println("[LiveEarthLibrary] Error reading file");
-            return new Star[0];
-        }
-        finally
-        {
-            if (fileReader != null)
-            {
-                try {
-                    bufferedReader.close();
-                }
-                catch (IOException e)
-                {
-                    return new Star[0];
-                }
-
-                try {
-                    fileReader.close();
-                }
-                catch (IOException e)
-                {
-                    return new Star[0];
-                }
-            }
-        }
-
+    /**
+     * Serialises the Json string of Simbad star data, and returns the star data contained therein
+     * @param szJsonText The Json string to extract the star data from
+     * @return An array of Stars
+     */
+    public static Star[] getStarListFromJsonText(String szJsonText)
+    {
         //Extract the Json data
-        StarData starData = gson.fromJson(jsonString, StarData.class);
+        StarData starData = (new Gson()).fromJson(szJsonText, StarData.class);
 
         //Fetch the size of the data list and initialise a new Star array with this star
         int iNumStars = starData.data.size();
         Star allStars[] = new Star[iNumStars];
 
-        System.out.println("[LiveEarthLibrary] " +iNumStars +" stars found");
+        System.out.println("[LiveEarthLibrary] " +iNumStars +" load from file");
 
         //Goes through the 'data' and extracts the information by converting the list of objects for each star into meaningful data
         for (int i = 0 ; i < iNumStars ; i++)
@@ -168,6 +144,59 @@ public class Star
             allStars[i] = star;
         }
         return allStars;
+    }
+
+    /**
+     * Reads in the json string from the 'All Stars.json' file in resources, and returns this json
+     * @return A JSON string for the data in the file
+     */
+    private static String readStarDataFromLibraryResources()
+    {
+        //Try to read in the json
+        FileReader fileReader = null;
+        BufferedReader bufferedReader = null;
+
+        try
+        {
+            InputStream inputStream = Star.class.getResourceAsStream("/All Stars.json");
+            InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+            bufferedReader = new BufferedReader(inputStreamReader);
+            return bufferedReader.readLine();
+
+        }
+        catch (IOException e)
+        {
+            System.out.println("[LiveEarthLibrary] Error reading file: "+e.getMessage());
+            e.printStackTrace();
+            return "";
+        }
+        catch (Exception e)
+        {
+            System.out.println("[LiveEarthLibrary] Error reading file: "+e.getMessage());
+            e.printStackTrace();
+            return "";
+        }
+        finally
+        {
+            if (fileReader != null)
+            {
+                try {
+                    bufferedReader.close();
+                }
+                catch (IOException e)
+                {
+                    return "";
+                }
+
+                try {
+                    fileReader.close();
+                }
+                catch (IOException e)
+                {
+                    return "";
+                }
+            }
+        }
     }
 }
 
