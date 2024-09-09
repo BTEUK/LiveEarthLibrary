@@ -1,5 +1,10 @@
 package net.bteuk.liveearthlibrary.spacegeometry;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
+import static java.lang.Math.floorDiv;
+
 /**
  * A set of utils for space geometry
  */
@@ -44,5 +49,45 @@ public class SpaceGeometryUtils
 
         SphericalCoordinates horizontalCoordinates = new SphericalCoordinates(altitude, azimuth);
         return horizontalCoordinates;
+    }
+
+    /**
+     * Converts a given data and time to a sidereal time at a given longitude
+     * @param dateTime The time and date at which to calculate the sidereal time.
+     * @param longitude The longitude (East positive) of the location to get the sidereal time for
+     */
+    public static Angle calculateLocalSiderealTime(Calendar dateTime, Angle longitude)
+    {
+        dateTime.setTimeZone(TimeZone.getTimeZone("GMT"));
+
+        int iYear = dateTime.get(Calendar.YEAR);
+        int iMonth = dateTime.get(Calendar.MONTH) + 1;
+        if (iMonth == 1 || iMonth == 2)
+        {
+            iYear = iYear - 1;
+            iMonth = iMonth + 12;
+        }
+
+        //Calculate leap years - i.e the number of feb 29ths
+        int A = floorDiv(iYear, 100);
+        int B = 2 - A + floorDiv(A, 4);
+
+        double julianDateAtMidnightJD0 = (int) (365.25 * (iYear + 4716)) + (int) (30.6001 * (iMonth + 1)) + dateTime.get(Calendar.DAY_OF_MONTH) + B - 1524.5;
+
+        //Current GMT time
+        Angle gmtTimeAngle = new Angle(dateTime.get(Calendar.HOUR_OF_DAY), dateTime.get(Calendar.MINUTE), dateTime.get(Calendar.SECOND), AngleUnit.Time);
+
+        double julianDateNowJDut = julianDateAtMidnightJD0 +  gmtTimeAngle.inDegrees()/360.0;
+        double julianDateNowJDtt = julianDateNowJDut;
+
+        double julianDaysSince2000Dtt = julianDateNowJDtt - 2451545.0f;
+        double julianDaysSince2000Dut = julianDateAtMidnightJD0 - 2451545.0f;
+
+        double dCenturiesSince2000T = (julianDaysSince2000Dtt)/36525f;
+
+        double GMTSiderealTime = (6.697375 + 0.065707485828 * julianDaysSince2000Dut + 1.0027379 * ((float) (gmtTimeAngle.inDegrees()/15f)) + 0.0854103 * dCenturiesSince2000T + 0.0000258 * dCenturiesSince2000T * dCenturiesSince2000T) % 24;
+        Angle greenwichSiderealTime = new Angle(GMTSiderealTime, 0, 0, AngleUnit.Time);
+
+        return new Angle(greenwichSiderealTime.inRadians()+longitude.inRadians());
     }
 }
