@@ -26,18 +26,27 @@ public class Angle
         switch (angleUnit)
         {
             case Degrees:
-                dAngleInDegrees = degreeOrHour + minute/60.0 + second/3600;
+                dAngleInDegrees = degreeOrHour + minute/60.0 + second/3600.0;
                 break;
             case Time:
-                dAngleInDegrees = degreeOrHour*15 + (minute/60.0)*15 + (second/360.0)*15;
+                double dSeconds = (degreeOrHour*3600) + (minute*60.0) + (second);
+                dAngleInDegrees = (dSeconds/86400.0)*360.0;
                 break;
             default:
                 dAngleInDegrees = degreeOrHour;
                 break;
         }
 
-        //Converts the angle to radians
-        this.angle = dAngleInDegrees*(Math.PI/180.0);
+        //Converts the prospectiveAngle to radians
+        double prospectiveAngle = dAngleInDegrees*(Math.PI/180.0);
+
+        //Trims the angle
+        while (prospectiveAngle >= (Math.PI*2f))
+        {
+            prospectiveAngle = prospectiveAngle - (Math.PI*2f);
+        }
+
+        this.angle = prospectiveAngle;
     }
 
     /**
@@ -103,5 +112,27 @@ public class Angle
     public static String degreesMinutesSecondsToString(double[] degMinSecArray)
     {
         return "("+degMinSecArray[0] +"°, " +degMinSecArray[1] +"', "+ degMinSecArray[2]+"\")";
+    }
+
+
+    /**
+     * Calculates the angle in decimal degrees, and then the angle in hours, minutes and seconds
+     * @return An array representing the angle in hours, minutes and seconds
+     */
+    public double[] inHoursMinutesSeconds()
+    {
+        double dAngleDegrees = this.angle * (180.0/Math.PI);
+        double dAngleHours = dAngleDegrees/15.0;
+
+        int iHours = (int) dAngleHours;
+
+        double dHoursRemaining = (dAngleHours - iHours);
+        double dMinutes = dHoursRemaining*60;
+        int iMinutes = (int) dMinutes;
+
+        double dMinuteRemainder = (dMinutes - iMinutes);
+        double dSeconds = dMinuteRemainder*60d;
+
+        return new double[]{iHours, iMinutes, dSeconds};
     }
 }
