@@ -23,19 +23,19 @@ public class Star
     /** The radius of the star (In Solar Radii)*/
     private final double dRadius;
 
-    /** The b-v colour of the star */
-    private final double bvColour;
+    /** The apparent magnitude in the blue band */
+    private final float fBMagnitude;
 
-    /** The apparent magnitude, m, of the star */
-    private final float fApparentMagnitude;
+    /** The apparent magnitude, m, of the star in visible */
+    private final float fVMagnitude;
 
-    public Star(String szName, SphericalCoordinates coordinates, double dRadius, double bvColour, float fApparentMagnitude)
+    public Star(String szName, SphericalCoordinates coordinates, double dRadius, float fApparentBlueMagnitude, float fApparentVisMagnitude)
     {
         this.szName = szName;
         this.equatorialCoordinates = coordinates;
         this.dRadius = dRadius;
-        this.bvColour = bvColour;
-        this.fApparentMagnitude = fApparentMagnitude;
+        this.fBMagnitude = fApparentBlueMagnitude;
+        this.fVMagnitude = fApparentVisMagnitude;
     }
 
     /**
@@ -69,18 +69,18 @@ public class Star
      *
      * @return The b-v colour of this star
      */
-    public double getBvColour()
+    public float getBvColour()
     {
-        return bvColour;
+        return fBMagnitude-fVMagnitude;
     }
 
     /**
      *
-     * @return The apparent magnitude of this star
+     * @return The apparent magnitude of this star in visible
      */
-    public float getfApparentMagnitude()
+    public float getfApparentVisibleMagnitude()
     {
-        return fApparentMagnitude;
+        return fVMagnitude;
     }
 
     /**
@@ -120,6 +120,7 @@ public class Star
             String mainId = "Unnamed Star";
             double ra = 0;
             double dec = 0;
+            double bMag = 10; //Ensures it isn't displayed if no details are provided
             double vMag = 10; //Ensures it isn't displayed if no details are provided
 
             //First check whether there is information in each field, then extract it
@@ -133,12 +134,14 @@ public class Star
             if (starDetails.get(3) != null)
                 dec = (Double) starDetails.get(3);
             if (starDetails.get(4) != null)
-                vMag = (Double) starDetails.get(4);
+                bMag = (Double) starDetails.get(4);
+            if (starDetails.get(5) != null)
+                vMag = (Double) starDetails.get(5);
 
             //Create the star object for this star
             Star star = new Star(mainId,
                     new SphericalCoordinates(new Angle(dec, 0, 0, AngleUnit.Degrees), new Angle(ra, 0, 0, AngleUnit.Degrees)),
-                    0, 0, (float) vMag);
+                    0, (float) bMag, (float) vMag);
 
             //Add this star to the list of stars to return
             allStars[i] = star;
@@ -153,7 +156,6 @@ public class Star
     private static String readStarDataFromLibraryResources()
     {
         //Try to read in the json
-        FileReader fileReader = null;
         BufferedReader bufferedReader = null;
 
         try
@@ -178,18 +180,11 @@ public class Star
         }
         finally
         {
-            if (fileReader != null)
+            if (bufferedReader != null)
             {
-                try {
-                    bufferedReader.close();
-                }
-                catch (IOException e)
+                try
                 {
-                    return "";
-                }
-
-                try {
-                    fileReader.close();
+                    bufferedReader.close();
                 }
                 catch (IOException e)
                 {
@@ -197,6 +192,58 @@ public class Star
                 }
             }
         }
+    }
+
+    /**
+     * Calculates an rgb value for the colour of this star
+     * @return An array of floats, representing the r, g, b values
+     */
+    public float[] calculateRGB()
+    {
+        //Declare variables
+        float r, g, b;
+
+        //Get the b-v value
+        float bv = getBvColour();
+
+        //Set anything redder than -0.4 to be -0.4
+        if (bv < -0.4f) bv = -0.4f;
+
+        //Set anything bluer than 2.0 to be 2.0
+        if (bv > 2.0f) bv = 2.0f;
+
+        //Red component
+        if (bv < 0.0f)
+            r = 0.61f + 0.11f * bv + 0.1f * bv * bv;
+        else if (bv < 0.4f)
+            r = 0.83f + 0.17f * bv;
+        else if (bv < 1.6f)
+            r = 1.0f;
+        else
+            r = 1.0f - 0.47f * (bv - 1.6f);
+
+        //Green component
+        if (bv < 0.0f)
+            g = 0.7f + 0.07f * bv + 0.1f * bv * bv;
+        else if (bv < 0.4f)
+            g = 0.87f + 0.11f * bv;
+        else if (bv < 1.5f)
+            g = 0.98f - 0.16f * (bv - 0.4f);
+        else
+            g = 0.82f - 0.5f * (bv - 1.5f);
+
+        // Blue component
+        if (bv < 0.0f)
+            b = 1.0f;
+        else if (bv < 0.4f)
+            b = 1.0f - 0.5f * bv;
+        else if (bv < 1.5f)
+            b = 0.6f - 0.7f * (bv - 0.4f);
+        else
+            b = 0.0f;
+
+        // Return RGB array
+        return new float[]{r, g, b};
     }
 }
 
@@ -220,3 +267,4 @@ class Metadata {
     @SerializedName("arraysize")  // Use @SerializedName if JSON field names don't match
     String arraySize;
 }
+
