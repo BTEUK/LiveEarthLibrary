@@ -30,4 +30,17 @@ public class SphericalCoordinates
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    /**
+     *
+     * @param latitude The latitude angle (Declination, Altitude, Latitude)
+     * @param longitude The longitude angle (RA, Azimuth, Longitude)
+     * @param dDistance The distance in meters that the object is from the origin
+     */
+    public SphericalCoordinates(Angle latitude, Angle longitude, double dDistance)
+    {
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.distance = dDistance;
+    }
 }
