@@ -13,11 +13,52 @@ public class Angle
      */
     public Angle(double angle)
     {
+        //Trims the angle
+        while (angle >= (Math.PI*2f))
+        {
+            angle = angle - (Math.PI*2f);
+        }
+
+        //Makes positive the angle
+        while (angle < 0)
+        {
+            angle = angle + (Math.PI*2f);
+        }
+
         this.angle = angle;
     }
 
     /**
-     * Allows the angle to be inputted as a time or degrees
+     * Allows the angle to be inputted as radians
+     */
+    public Angle(double angle, boolean bAllowNegative)
+    {
+        //Trims the angle
+        while (angle >= (Math.PI*2f))
+        {
+            angle = angle - (Math.PI*2f);
+        }
+
+        //Trims the angle on the negative side
+        while (angle <= -(Math.PI*2f))
+        {
+            angle = angle + (Math.PI*2f);
+        }
+
+        if (!bAllowNegative)
+        {
+            //Trims the angle
+            while (angle < 0)
+            {
+                angle = angle + (Math.PI*2f);
+            }
+        }
+
+        this.angle = angle;
+    }
+
+    /**
+     * Allows the angle to be inputted as a time or degrees. Will always shift the angle to be between 0 and 2 pi.
      */
     public Angle(double degreeOrHour, double minute, double second, AngleUnit angleUnit)
     {
@@ -87,7 +128,7 @@ public class Angle
 
     /**
      * Calculates the angle in decimal degrees, and then the angle in degrees, arcminutes and arcseconds
-     * @return An array representing the angle in degrees, arcminutes and arcseconds
+     * @return A string representing the angle in degrees, arcminutes and arcseconds
      */
     public String inDegreesMinutesSecondsToString()
     {
@@ -135,4 +176,36 @@ public class Angle
 
         return new double[]{iHours, iMinutes, dSeconds};
     }
+
+    /**
+     * Calculates the angle in decimal degrees, and then the angle in hours, minutes and seconds
+     * @return A string representing the angle in hours, minutes and seconds
+     */
+    public String inHoursMinutesSecondsToString()
+    {
+        double dAngleDegrees = this.angle * (180.0/Math.PI);
+        double dAngleHours = dAngleDegrees/15.0;
+
+        int iHours = (int) dAngleHours;
+
+        double dHoursRemaining = (dAngleHours - iHours);
+        double dMinutes = dHoursRemaining*60;
+        int iMinutes = (int) dMinutes;
+
+        double dMinuteRemainder = (dMinutes - iMinutes);
+        double dSeconds = dMinuteRemainder*60d;
+
+        return "("+iHours +"h, " +iMinutes +"m, "+ dSeconds+"s)";
+    }
+
+    /**
+     * Formats an angle in hours, minutes and seconds to a string
+     * @param hourMinSecArray An array representing an angle in hours, minutes and seconds
+     * @return A string expressing the angle in hours, minutes and seconds
+     */
+    public static String hoursMinutesSecondsToString(double[] hourMinSecArray)
+    {
+        return "("+hourMinSecArray[0] +"h, " +hourMinSecArray[1] +"m, "+ hourMinSecArray[2]+"s)";
+    }
+
 }
