@@ -12,27 +12,20 @@ import java.util.List;
 /**
  * A class to represent a Star
  */
-public class Star
+public class Star extends CelestialObject
 {
-    /** The common name of the star */
-    private final String szName;
-
-    /** The equatorial coordinates (RA, DEC and distance (In PC)) of the star */
-    private final SphericalCoordinates equatorialCoordinates;
-
-    /** The radius of the star (In Solar Radii)*/
-    private final double dRadius;
-
     /** The apparent magnitude in the blue band */
     private final float fBMagnitude;
 
     /** The apparent magnitude, m, of the star in visible */
     private final float fVMagnitude;
 
+    /** The radius of the star (In Solar Radii)*/
+    private final double dRadius;
+
     public Star(String szName, SphericalCoordinates coordinates, double dRadius, float fApparentBlueMagnitude, float fApparentVisMagnitude)
     {
-        this.szName = szName;
-        this.equatorialCoordinates = coordinates;
+        super(szName, coordinates);
         this.dRadius = dRadius;
         this.fBMagnitude = fApparentBlueMagnitude;
         this.fVMagnitude = fApparentVisMagnitude;
@@ -45,15 +38,6 @@ public class Star
     public String getName()
     {
         return szName;
-    }
-
-    /**
-     *
-     * @return A reference to the spherical coordinates of this star
-     */
-    public SphericalCoordinates getEquatorialCoordinates()
-    {
-        return equatorialCoordinates;
     }
 
     /**
