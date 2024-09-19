@@ -1,13 +1,12 @@
 package net.bteuk.liveearthlibrary.astronomy;
 
 import net.bteuk.liveearthlibrary.spacegeometry.SphericalCoordinates;
-import org.orekit.data.DataContext;
-import org.orekit.data.DataProvidersManager;
-import org.orekit.data.DirectoryCrawler;
+import org.orekit.data.*;
 
-import java.io.File;
-import java.net.URISyntaxException;
-import java.net.URL;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public abstract class CelestialObject
 {
@@ -50,22 +49,16 @@ public abstract class CelestialObject
      */
     private static DataProvidersManager loadData()
     {
-        DataProvidersManager manager = null;
-
-        //Attempt to load the data
-        try
-        {
-            URL filePath = CelestialObject.class.getResource("/orekit-data-master");
-            assert filePath != null;
-            File orekitData = new File(filePath.toURI());
-            manager = DataContext.getDefault().getDataProvidersManager();
-            manager.addProvider(new DirectoryCrawler(orekitData));
-        }
-        catch (URISyntaxException | NullPointerException e)
-        {
-            e.printStackTrace();
-        }
+        manager = DataContext.getDefault().getDataProvidersManager();
+        manager.addProvider(new ZipJarCrawler("orekit-data-master.zip"));
 
         return manager;
+    }
+
+    private static void copyStreamToFile(InputStream inputStream, Path targetPath) throws IOException
+    {
+        // Copy the InputStream to the target location
+        Files.copy(inputStream, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        inputStream.close();
     }
 }
